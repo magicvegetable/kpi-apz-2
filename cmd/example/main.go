@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	lab2 "github.com/maaagicvegetable/kpi-apz-2"
+	"io"
+	"os"
+	"strings"
 )
 
 var (
