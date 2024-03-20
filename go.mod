@@ -1,4 +1,4 @@
-module github.com/magicvegetable/kpi-apz-2
+module github.com/maaagicvegetable/kpi-apz-2
 
 go 1.22
 
