@@ -10,21 +10,48 @@ import (
 )
 
 var (
-	inputExpression = flag.String("e", "", "Expression to compute")
-	// TODO: Add other flags support for input and output configuration.
+	expressionInput = flag.String("e", "", "Expression to compute")
+	expressionFile  = flag.String("f", "", "File containing the expression to compute")
+	outputFile      = flag.String("o", "", "File to place output")
 )
 
 func main() {
 	flag.Parse()
 
-	// TODO: Change this to accept input from the command line arguments as described in the task and
-	//       output the results using the ComputeHandler instance.
-	//       handler := &lab2.ComputeHandler{
-	//           Input: {construct io.Reader according the command line parameters},
-	//           Output: {construct io.Writer according the command line parameters},
-	//       }
-	//       err := handler.Compute()
+	var Input io.Reader
+	Output := os.Stdout
 
-	res, _ := lab2.PrefixToPostfix("+ 2 2")
-	fmt.Println(res)
+	if *outputFile != "" {
+		file, err := os.OpenFile(*outputFile, os.O_RDWR|os.O_CREATE, 0644)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, "Fallback to stdout as output")
+		} else {
+			Output = file
+		}
+	}
+
+	if *expressionFile != "" {
+		file, err := os.Open(*expressionFile)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+		} else {
+			Input = file
+		}
+	}
+
+	if *expressionInput != "" {
+		if Input != nil {
+			fmt.Fprintln(os.Stderr, "The expression is already set")
+			fmt.Fprintln(os.Stderr, "Ignoring:", *expressionInput)
+		} else {
+			Input = strings.NewReader(*expressionInput)
+		}
+	}
+
+	ch := lab2.ComputeHandler{Input, Output}
+	err := ch.Compute()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
 }
